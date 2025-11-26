@@ -1,0 +1,29 @@
+{
+  "name": "mika-god-mode",
+  "version": "69.4.20",
+  "description": "Too angry to write a description",
+  "main": "mika.js",
+  "scripts": {
+    "start": "node mika.js",
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
+    "clear": "^0.1.0",
+    "configstore": "^5.0.1",
+    "enquirer": "^2.4.1",
+    "figlet": "^1.6.0",
+    "gradient-string": "^2.0.2",
+    "input": "^1.0.0",
+    "mongoose": "^8.0.0",
+    "node-machine-id": "^1.1.12",
+    "ora": "^5.4.1",
+    "telegram": "^2.19.0"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.0.0"
+  },
+  "author": "Reinhart"
+}
