@@ -36,7 +36,7 @@ jobs:
         cd ..
 
     - name: Publish Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: latest
         name: MIKA - Latest Build
@@ -44,6 +44,5 @@ jobs:
         files: mika-god-mode.zip
         draft: false
         prerelease: false
-        allow_updates: true
         make_latest: true
         token: ${{ secrets.MY_PAT }}
