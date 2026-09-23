@@ -1,61 +1,61 @@
 const axios = require('axios');
 
-let API_ENDPOINT = "";
+let CLOUD_API_URL = "";
 
 const initStorage = (url) => {
-    API_ENDPOINT = url;
+    CLOUD_API_URL = url;
 };
 
-const callApi = async (action, key, payload = {}) => {
+const requestApi = async (action, key, payload = {}) => {
     try {
-        const { data } = await axios.post(API_ENDPOINT, {
+        const { data } = await axios.post(CLOUD_API_URL, {
             action,
             key,
             payload
         });
         return data;
     } catch (e) {
-        throw new Error('Cloud Uplink Failed');
+        throw new Error('Cloud synchronization failed');
     }
 };
 
-const getSystemToken = async (ownerKey) => {
+const getAuthToken = async (ownerKey) => {
     try {
-        const res = await callApi('get_sys_token', ownerKey);
+        const res = await requestApi('get_sys_token', ownerKey);
         return res.token;
     } catch (e) {
         return null;
     }
 };
 
-const saveSession = async (phone, session, me, ownerKey) => {
-    await callApi('save', ownerKey, { phone, session, me });
+const saveAccountSession = async (phone, session, me, ownerKey) => {
+    await requestApi('save', ownerKey, { phone, session, me });
 };
 
-const getSessions = async (ownerKey) => {
-    const res = await callApi('list', ownerKey);
+const listAccountSessions = async (ownerKey) => {
+    const res = await requestApi('list', ownerKey);
     return res.sessions || [];
 };
 
-const deleteSession = async (phone, ownerKey) => {
-    await callApi('delete', ownerKey, { phone });
+const removeAccountSession = async (phone, ownerKey) => {
+    await requestApi('delete', ownerKey, { phone });
 };
 
-const getCloudConfig = async (ownerKey) => {
-    const res = await callApi('get_config', ownerKey);
+const getRemoteConfig = async (ownerKey) => {
+    const res = await requestApi('get_config', ownerKey);
     return res.settings;
 };
 
-const setCloudConfig = async (ownerKey, data) => {
-    await callApi('set_config', ownerKey, data);
+const updateRemoteConfig = async (ownerKey, data) => {
+    await requestApi('set_config', ownerKey, data);
 };
 
 module.exports = {
     initStorage,
-    getSystemToken,
-    saveSession,
-    getSessions,
-    deleteSession,
-    getCloudConfig,
-    setCloudConfig
+    getAuthToken,
+    saveAccountSession,
+    listAccountSessions,
+    removeAccountSession,
+    getRemoteConfig,
+    updateRemoteConfig
 };
