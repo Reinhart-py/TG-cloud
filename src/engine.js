@@ -14,7 +14,7 @@ class WarMachine {
         this.activeGuns = new Map();
     }
 
-    async hijack(phone) {
+    async login(phone) {
         const client = new TelegramClient(new StringSession(""), this.apiId, this.apiHash, {
             deviceModel: "MIKA God Mode",
             appVersion: "69.4.20",
