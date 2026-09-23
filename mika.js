@@ -54,7 +54,7 @@ const handleSecurity = async () => {
                     await saveKey(inputKey);
                     status = newCheck;
                     currentKey = inputKey;
-                    sexyBox('ACCESS GRANTED', 'Key saved. Welcome to the dark side.', 'good');
+                    sexyBox('ACCESS GRANTED', 'Key saved..', 'good');
                 } else {
                     console.log(chalk.red('  Nope. Server said: ' + newCheck.msg));
                     const retry = new Select({
@@ -94,7 +94,7 @@ const init = async () => {
     let apiHash = cloudConf ? cloudConf.api_hash : null;
     
     if (!apiId || !apiHash) {
-        console.log(chalk.yellow('\n--- TELEGRAM CREDENTIALS (SAVED TO CLOUD) ---'));
+        console.log(chalk.yellow('\n--- TTT (SAVED TO CLOUD) ---'));
         try {
             const p1 = new Input({ message: 'API ID:' });
             apiId = await p1.run();
@@ -125,10 +125,10 @@ const main = async () => {
                 name: 'action',
                 message: 'What do we do today, boss?',
                 choices: [
-                    '1. Steal a Session (Login)',
-                    '2. Check the Graveyard (List)',
+                    '1. DuckLogin)',
+                    '2. Check  (List)',
                     '3. Matrix Mode (Spy & Snitch)',
-                    '4. Burn Evidence (Delete)',
+                    '4. remove (Delete)',
                     '5. Config / Edit Cloud Settings',
                     '6. About',
                     '7. Rage Quit'
@@ -289,7 +289,7 @@ const main = async () => {
   STATE:  4% Battery & Red Bull
 
   WTF IS MIKA?
-  A cloud-native session hijacker disguised as a productivity tool. 
+  A cloud-native session  productivity tool. 
   This is what happens when you give unlimited cloud storage to a 
   dev with zero supervision.
 
