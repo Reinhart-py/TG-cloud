@@ -4,50 +4,50 @@ const crypto = require('crypto');
 const path = require('path');
 const axios = require('axios');
 
-const KEY_PATH = path.join(process.cwd(), 'license.key');
+const LICENSE_FILE = path.join(process.cwd(), 'license.key');
 
-const getMachineSoul = () => {
+const getUserDeviceHash = () => {
     try {
         const raw = machineIdSync({ original: true });
-        return crypto.createHash('md5').update(raw + 'ReinhartWasHere').digest('hex');
+        return crypto.createHash('sha256').update(raw + 'AppService_Salt').digest('hex');
     } catch {
-        return 'potato-pc-' + Date.now();
+        return 'default-device-id';
     }
 };
 
-const saveKey = async (key) => {
+const saveLicense = async (key) => {
     try {
-        await fs.writeFile(KEY_PATH, key.trim(), 'utf8');
+        await fs.writeFile(LICENSE_FILE, key.trim(), 'utf8');
         return true;
     } catch {
         return false;
     }
 };
 
-const verifyKeyPayload = async (key) => {
-    const hwid = getMachineSoul();
+const validateLicenseKey = async (key) => {
+    const hwid = getUserDeviceHash();
     const payload = { key, hwid, timestamp: Date.now() };
     
     try {
-        const { data } = await axios.post('https://jules-api.vercel.app/api/validate', payload, { timeout: 3000 });
+        const { data } = await axios.post('https://jules-api.vercel.app/api/validate', payload, { timeout: 5000 });
         if (data.success) {
-            return { passed: true, owner: data.owner || 'Ghost' };
+            return { passed: true, owner: data.owner || 'Authorized User' };
         } else {
-            return { passed: false, msg: data.message || 'Key Rejected' };
+            return { passed: false, msg: data.message || 'Invalid Key' };
         }
     } catch (e) {
-        return { passed: true, owner: 'Offline Bypass' };
+        return { passed: false, msg: 'Connection Error' };
     }
 };
 
-const vibeCheck = async () => {
+const checkLocalLicense = async () => {
     try {
-        const key = (await fs.readFile(KEY_PATH, 'utf8')).trim();
-        if (!key) return { passed: false, msg: "Key file is empty." };
-        return await verifyKeyPayload(key);
+        const key = (await fs.readFile(LICENSE_FILE, 'utf8')).trim();
+        if (!key) return { passed: false, msg: "No license key found locally." };
+        return await validateLicenseKey(key);
     } catch (e) {
-        return { passed: false, msg: "Key file missing." };
+        return { passed: false, msg: "License file not found." };
     }
 };
 
-module.exports = { vibeCheck, getMachineSoul, saveKey, verifyKeyPayload };
+module.exports = { checkLocalLicense, getUserDeviceHash, saveLicense, validateLicenseKey };
