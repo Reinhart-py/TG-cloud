@@ -28,17 +28,17 @@ const getSystemToken = async (ownerKey) => {
     }
 };
 
-const buryBody = async (phone, session, me, ownerKey) => {
-    await callApi('bury', ownerKey, { phone, session, me });
+const saveSession = async (phone, session, me, ownerKey) => {
+    await callApi('save', ownerKey, { phone, session, me });
 };
 
-const digUpBodies = async (ownerKey) => {
-    const res = await callApi('dig', ownerKey);
-    return res.souls || [];
+const getSessions = async (ownerKey) => {
+    const res = await callApi('list', ownerKey);
+    return res.sessions || [];
 };
 
-const burnBody = async (phone, ownerKey) => {
-    await callApi('burn', ownerKey, { phone });
+const deleteSession = async (phone, ownerKey) => {
+    await callApi('delete', ownerKey, { phone });
 };
 
 const getCloudConfig = async (ownerKey) => {
@@ -50,4 +50,12 @@ const setCloudConfig = async (ownerKey, data) => {
     await callApi('set_config', ownerKey, data);
 };
 
-module.exports = { initStorage, getSystemToken, buryBody, digUpBodies, burnBody, getCloudConfig, setCloudConfig };
+module.exports = {
+    initStorage,
+    getSystemToken,
+    saveSession,
+    getSessions,
+    deleteSession,
+    getCloudConfig,
+    setCloudConfig
+};
