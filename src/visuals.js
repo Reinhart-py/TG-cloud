@@ -8,42 +8,33 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 const renderTitle = () => {
     clear();
-    const txt = figlet.textSync('MIKA', { font: 'Slant' });
+    const txt = figlet.textSync('BusinessUI', { font: 'Slant' });
     console.log(gradient.pastel.multiline(txt));
-    console.log(gradient.cristal('         Created by Reinhart | v69.4.20 | No Sleep Edition'));
+    console.log(gradient.cristal('         Corporate Account Manager | Enterprise Edition'));
     console.log(chalk.hex('#444444')('─────────────────────────────────────────────────────────────'));
 };
 
-const sexyBox = (header, content, style = 'info') => {
-    const border = style === 'bad' ? 'red' : style === 'good' ? 'green' : 'cyan';
+const displayInfoBox = (header, content, style = 'info') => {
+    const borderColor = style === 'error' ? 'red' : style === 'success' ? 'green' : 'cyan';
     console.log(boxen(content, {
         title: header,
         titleAlignment: 'center',
-        borderStyle: 'bold',
-        borderColor: border,
+        borderStyle: 'round',
+        borderColor: borderColor,
         padding: 1,
-        margin: 1,
-        float: 'center'
+        margin: 1
     }));
 };
 
-const crazyLoader = async (text, duration = 2000) => {
+const startLoadingTask = async (text, duration = 2000) => {
     const ora = require('ora');
     const spinner = ora({
-        text: chalk.yellow(text),
-        spinner: 'grenade'
+        text: chalk.blue(text),
+        spinner: 'dots'
     }).start();
     
     await sleep(duration);
-    
-    if (Math.random() > 0.9) {
-        spinner.fail(chalk.red('Wait... sh*t.'));
-        await sleep(500);
-        spinner.text = chalk.green('Just kidding, we good.');
-        spinner.start();
-        await sleep(800);
-    }
-    spinner.succeed(chalk.green('Done.'));
+    spinner.succeed(chalk.green('Task completed.'));
 };
 
-module.exports = { renderTitle, sexyBox, crazyLoader, sleep };
+module.exports = { renderTitle, displayInfoBox, startLoadingTask, sleep };
